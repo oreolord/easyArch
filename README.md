@@ -31,3 +31,8 @@ mount /dev/USB share # Substitute USB with the USB name from earlier
 
 The script will start, and reboot the computer when finished.
 Enjoy!
+
+Todo:
+- Timezone support
+- Keymap support
+- Post-installation script
