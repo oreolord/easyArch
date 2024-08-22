@@ -16,6 +16,7 @@ If you find any bugs or think of a way to make it better, please make an issue!
 ```
 pacman -Sy git
 git clone https://github.com/oreolord/eZarch.git share
+chmod +x share/archinstall.sh
 ./share/archinstall.sh
 ```
 4. Fill out the options.
