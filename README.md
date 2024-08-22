@@ -2,8 +2,7 @@
 # Easy install script of Arch Linux 
 Supports Wayland on NVIDIA graphics cards. 
 
-Boots with either GRUB or systemd boot,
-The script may work if you copy it to the install USB, but I haven't tried
+Boots with either GRUB or systemd boot
 
 If you find any bugs or think of a way to make it better, please make an issue!
 > [!WARNING]
@@ -11,21 +10,13 @@ If you find any bugs or think of a way to make it better, please make an issue!
 
 
 ## How to use:
-1. Copy all repository files into a USB (preferrably formatted as FAT32).
+1. Boot into your install usb.
 
-> [!IMPORTANT]
-> **Make sure the files are not in a separate folder inside the usb!**
-
-2. Boot into your arch install medium.
-
-3. Type ```lsblk``` into terminal and find the USB and it's partition with the script on it (Ex. sdb1).
-_Remember this name!_
-
-Type these commands one by one:
+2. Put in these commands one by one:
 ```
-mkdir share
-mount /dev/USB share # Substitute USB with the USB name from earlier
-./share/eZarch.sh
+pacman -Sy git
+git clone https://github.com/oreolord/eZarch.git share
+./share/archinstall.sh
 ```
 4. Fill out the options.
 
