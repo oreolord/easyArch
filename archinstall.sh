@@ -1,28 +1,81 @@
-lsblk
-echo "Which drive would you like to install on?"
-read drive
-if [ "{$drive:0:3}" = "nvm"]; then
-    $type="NVME"
-else
-    $type="SATA"
-fi
-PS3="What is your CPU brand?"
-select cpubrand in "Intel" "AMD"; do done
-PS3="What is your GPU brand?"
-select gpubrand in "NVIDIA" "AMD"; do done
-PS3="Pick a bootloader:"
-select booter in "Grub" "Systemd"; do done
-ip link
-echo "What is your internet adapter name? (Ex. enp5s0)"
-read adapter
-echo "Please type your desired hostname:"
-read hostname
-echo "Please type your desired username:"
-read username
-echo "Please type your desired password:"
-read password
-echo "Please type your desired root password:"
-read rootpw
+start="n"
+while [ "$start" != "y" ]
+do
+    lsblk
+    echo "Which drive would you like to install on?"
+    read drive
+    type=""
+    gpubrand=""
+    cpubrand=""
+    booter=""
+
+    if [[ "${drive:0:3}" == "nvm" ]]; then
+        type="NVME"
+    else
+        type="SATA"
+    fi
+    PS3="What is your CPU brand? "
+    select optiona in "Intel" "AMD"; do
+        case $optiona in
+            "Intel")
+                cpubrand="Intel"
+                break
+                ;;
+            "AMD")
+                cpubrand="AMD"
+                break
+                ;;
+        esac
+    done
+    PS3="What is your GPU brand? "
+    select optionb in "NVIDIA" "AMD"; do
+        case $optionb in
+            "NVIDIA")
+                gpubrand="NVIDIA"
+                break
+                ;;
+            "AMD")
+                gpubrand="AMD"
+                break
+                ;;
+        esac
+    done
+    PS3="Pick a bootloader: "
+    select optionc in "Grub" "Systemd"; do
+        case $optionc in
+            "Grub")
+                booter="Grub"
+                break
+                ;;
+            "Systemd")
+                booter="Systemd"
+                break
+                ;;
+        esac
+    done
+    ip link
+    echo "What is your internet adapter name? (Ex. enp5s0)"
+    read adapter
+    echo "Please type your desired hostname:"
+    read hostname
+    echo "Please type your desired username:"
+    read username
+    echo "Please type your desired password:"
+    read password
+    echo "Please type your desired root password:"
+    read rootpw
+    echo "Selected options:"
+    echo "|       System       |        Users       |"
+    echo "-------------------------------------------"
+    echo "|   CPU: $cpubrand      | Hostname: $hostname   |"
+    echo "|   GPU: $gpubrand      | Username: $username  |"
+    echo "|   LAN: $adapter     | Password: $password   |"
+    echo "|   Boot: $booter     | Rootpswd: $rootpw     |"
+    echo "|   Drive: $drive     |                      |"
+    echo "|   Type: $type         |                    |"
+    echo "Are these settings correct? y/n"
+    read start
+done
 parted /dev/$drive mklabel gpt
 (
 echo n # Add a new partition
