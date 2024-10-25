@@ -14,7 +14,7 @@ Boots with either GRUB or systemd boot
 2. Put in these commands one by one:
 ```
 pacman -Sy git
-git clone https://github.com/oreolord/eZarch.git share
+git clone https://github.com/oreolord/easyArch.git share
 chmod +x share/archinstall.sh
 ./share/archinstall.sh
 ```
