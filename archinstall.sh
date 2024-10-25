@@ -53,9 +53,6 @@ do
                 ;;
         esac
     done
-    ip link
-    echo "What is your internet adapter name? (Ex. enp5s0)"
-    read adapter
     echo "Please type your desired hostname:"
     read hostname
     echo "Please type your desired username:"
@@ -69,10 +66,9 @@ do
     echo "-------------------------------------------"
     echo "|   CPU: $cpubrand      | Hostname: $hostname   |"
     echo "|   GPU: $gpubrand      | Username: $username  |"
-    echo "|   LAN: $adapter     | Password: $password   |"
-    echo "|   Boot: $booter     | Rootpswd: $rootpw     |"
-    echo "|   Drive: $drive     |                      |"
-    echo "|   Type: $type         |                    |"
+    echo "|   Boot: $booter    | Password: $password   |"
+    echo "|   Drive: $drive     | Rootpswd: $rootpw     |"
+    echo "|   Type: $type     |                      |"
     echo "Are these settings correct? y/n"
     read start
 done
@@ -115,11 +111,11 @@ elif [ "$type" = "NVME" ]; then
     mount /dev/$drive\p1 /mnt/boot
 fi
 if [ "$cpubrand" = "Intel" ]; then
-    pacstrap -K /mnt base base-devel linux linux-firmware git curl intel-ucode nano bash-completion networkmanager dhcpcd linux-headers
+    pacstrap -K /mnt base base-devel linux linux-firmware git curl intel-ucode nano bash-completion networkmanager linux-headers
 elif [ "$cpubrand" = "AMD" ]; then
-    pacstrap -K /mnt base base-devel linux linux-firmware git curl amd-ucode nano bash-completion networkmanager dhcpcd linux-headers
+    pacstrap -K /mnt base base-devel linux linux-firmware git curl amd-ucode nano bash-completion networkmanager linux-headers
 else
-    pacstrap -K /mnt base base-devel linux linux-firmware git curl nano bash-completion networkmanager dhcpcd linux-headers
+    pacstrap -K /mnt base base-devel linux linux-firmware git curl nano bash-completion networkmanager linux-headers
 fi
 genfstab -U -p /mnt >> /mnt/etc/fstab
 echo "( echo $rootpw; echo $rootpw ) | passwd " | arch-chroot /mnt
@@ -144,7 +140,6 @@ if [ "$booter" = "Systemd" ]; then
     cp share/arch.conf /mnt/boot/loader/entries/arch.conf
 fi
 echo 'systemctl enable fstrim.timer' | arch-chroot /mnt
-echo "systemctl enable dhcpcd@$adapter.service" | arch-chroot /mnt
 echo 'systemctl enable NetworkManager' | arch-chroot /mnt
 if [ "$gpubrand" = "AMD" ] && [ "$booter" = "Systemd" ] && [ "$type" = "SATA" ]; then
     echo "echo "options root=PARTUUID=$(blkid -s PARTUUID -o value /dev/$drive\3) rw quiet" >> /boot/loader/entries/arch.conf" | arch-chroot /mnt
