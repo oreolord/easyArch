@@ -9,11 +9,19 @@ do
     gpubrand=""
     cpubrand=""
     booter=""
-
+    bootpar=""
+    homepar=""
+    swappar=""
     if [[ "${drive:0:3}" == "nvm" ]]; then
         type="NVME"
+        bootpar = "/dev/$drive\p1"
+        swappar = "/dev/$drive\p2"
+        rootpar = "/dev/$drive\p3"
     else
         type="SATA"
+        bootpar = "/dev/$drive\1"
+        swappar = "/dev/$drive\2"
+        rootpar = "/dev/$drive\3"
     fi
     PS3="What is your CPU brand? "
     select optiona in "Intel" "AMD"; do
@@ -45,7 +53,7 @@ do
     select optionc in "Grub" "Systemd"; do
         case $optionc in
             "Grub")
-                booter="Grub"
+                booter="Grub (recommended)"
                 break
                 ;;
             "Systemd")
@@ -94,23 +102,13 @@ echo
 echo
 echo w
 ) | fdisk /dev/$drive
-if [ "$type" = "SATA" ]; then
-    mkfs.fat -F32 /dev/$drive\1
-    mkswap /dev/$drive\2
-    mkfs.ext4 /dev/$drive\3
-    swapon /dev/$drive\2
-    mount /dev/$drive\3 /mnt
-    mkdir /mnt/boot
-    mount /dev/$drive\1 /mnt/boot
-elif [ "$type" = "NVME" ]; then
-    mkfs.fat -F32 /dev/$drive\p1
-    mkswap /dev/$drive\p2
-    mkfs.ext4 /dev/$drive\p3
-    swapon /dev/$drive\p2
-    mount /dev/$drive\p3 /mnt
-    mkdir /mnt/boot
-    mount /dev/$drive\p1 /mnt/boot
-fi
+mkfs.fat -F32 $bootpar
+mkswap $swappar
+mkfs.ext4 $rootpar
+swapon $swappar
+mount $rootpar /mnt
+mkdir /mnt/boot
+mount $bootpar /mnt/boot
 if [ "$cpubrand" = "Intel" ]; then
     pacstrap -K /mnt base base-devel linux linux-firmware git curl intel-ucode nano bash-completion networkmanager linux-headers
 elif [ "$cpubrand" = "AMD" ]; then
@@ -127,4 +125,5 @@ export gpubrand
 export type
 export rootpw
 export password
+export hostname
 arch-chroot /mnt ./easyarch/chroot.sh
