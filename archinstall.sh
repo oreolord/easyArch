@@ -1,3 +1,4 @@
+#!/bin/bash
 start="n"
 while [ "$start" != "y" ]
 do
@@ -117,64 +118,13 @@ elif [ "$cpubrand" = "AMD" ]; then
 else
     pacstrap -K /mnt base base-devel linux linux-firmware git curl nano bash-completion networkmanager linux-headers
 fi
-genfstab -U -p /mnt >> /mnt/etc/fstab
-echo "( echo $rootpw; echo $rootpw ) | passwd " | arch-chroot /mnt
-echo "useradd -m -g users -G wheel,power,storage,video,audio -s /bin/bash $username" | arch-chroot /mnt
-echo "( echo $password; echo $password ) | passwd  $username" | arch-chroot /mnt
-cp share/sudoers /mnt/etc/sudoers
-echo 'ln -sf /usr/share/zoneinfo/US/Eastern /etc/localtime' | arch-chroot /mnt
-echo 'hwclock --systohc' | arch-chroot /mnt
-cp share/locale.gen /mnt/etc/locale.gen
-echo 'locale-gen' | arch-chroot /mnt
-echo 'echo LANG=en_US.UTF-8 > /etc/locale.conf' | arch-chroot /mnt
-echo "echo $hostname > /etc/hostname" | arch-chroot /mnt
-cp share/pacman.conf /mnt/etc/pacman.conf
-echo 'pacman -Sy --noconfirm' | arch-chroot /mnt
-if [ "$booter" = "Grub" ]; then
-    echo 'pacman -S --noconfirm grub efibootmgr dosfstools mtools' | arch-chroot /mnt
-    echo 'grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=Arch' | arch-chroot /mnt
-    echo 'grub-mkconfig -o /boot/grub/grub.cfg' | arch-chroot /mnt
-fi
-if [ "$booter" = "Systemd" ]; then
-    echo 'bootctl install' | arch-chroot /mnt
-    cp share/arch.conf /mnt/boot/loader/entries/arch.conf
-fi
-echo 'systemctl enable fstrim.timer' | arch-chroot /mnt
-echo 'systemctl enable NetworkManager' | arch-chroot /mnt
-if [ "$gpubrand" = "AMD" ] && [ "$booter" = "Systemd" ] && [ "$type" = "SATA" ]; then
-    echo "echo "options root=PARTUUID=$(blkid -s PARTUUID -o value /dev/$drive\3) rw quiet" >> /boot/loader/entries/arch.conf" | arch-chroot /mnt
-    echo 'pacman -S --noconfirm mesa libva-mesa-driver vulkan-radeon xf86-video-amdgpu' | arch-chroot /mnt
-fi
-if [ "$gpubrand" = "AMD" ] && [ "$booter" = "Systemd" ] && [ "$type" = "NVME" ]; then
-    echo "echo "options root=PARTUUID=$(blkid -s PARTUUID -o value /dev/$drive\p3) rw quiet" >> /boot/loader/entries/arch.conf" | arch-chroot /mnt
-    echo 'pacman -S --noconfirm mesa libva-mesa-driver vulkan-radeon xf86-video-amdgpu' | arch-chroot /mnt
-fi
-if [ "$gpubrand" = "AMD" ] && [ "$booter" = "Grub" ]; then
-    echo 'pacman -S --noconfirm mesa libva-mesa-driver vulkan-radeon xf86-video-amdgpu' | arch-chroot /mnt
-fi
-if [ "$gpubrand" = "NVIDIA" ] && [ "$booter" = "Systemd" ] && [ "$type" = "SATA"]; then
-    echo 'pacman -S --noconfirm nvidia-open libglvnd nvidia-utils opencl-nvidia lib32-libglvnd lib32-opencl-nvidia nvidia-settings' | arch-chroot /mnt
-    cp share/mkinitcpio.conf /mnt/etc/mkinitcpio.conf
-    echo "echo "options root=PARTUUID=$(blkid -s PARTUUID -o value /dev/$drive\3) rw nvidia_drm.modeset=1 quiet" >> /boot/loader/entries/arch.conf" | arch-chroot /mnt
-    mkdir /mnt/etc/pacman.d/hooks
-    cp share/nvidia.hook /mnt/etc/pacman.d/hooks/nvidia.hook
-    cp share/nvidia.conf /mnt/etc/modprobe.d/nvidia.conf
-fi
-if [ "$gpubrand" = "NVIDIA" ] && [ "$booter" = "Systemd" ] && [ "$type" = "NVME"]; then
-    echo 'pacman -S --noconfirm nvidia-open libglvnd nvidia-utils opencl-nvidia lib32-libglvnd lib32-opencl-nvidia nvidia-settings' | arch-chroot /mnt
-    cp share/mkinitcpio.conf /mnt/etc/mkinitcpio.conf
-    echo "echo "options root=PARTUUID=$(blkid -s PARTUUID -o value /dev/$drive\p3) rw nvidia_drm.modeset=1 quiet" >> /boot/loader/entries/arch.conf" | arch-chroot /mnt
-    mkdir /mnt/etc/pacman.d/hooks
-    cp share/nvidia.hook /mnt/etc/pacman.d/hooks/nvidia.hook
-    cp share/nvidia.conf /mnt/etc/modprobe.d/nvidia.conf
-fi
-if [ "$gpubrand" = "NVIDIA" ] && [ "$booter" = "Grub" ]; then
-    echo 'pacman -S --noconfirm nvidia-open libglvnd nvidia-utils opencl-nvidia lib32-libglvnd lib32-opencl-nvidia nvidia-settings' | arch-chroot /mnt
-    cp share/mkinitcpio.conf /mnt/etc/mkinitcpio.conf
-    cp share/grub /mnt/etc/default/grub
-    mkdir /mnt/etc/pacman.d/hooks
-    cp share/nvidia.hook /mnt/etc/pacman.d/hooks/nvidia.hook
-    cp share/nvidia.conf /mnt/etc/modprobe.d/nvidia.conf
-fi
-umount -R /mnt
-reboot
+genfstab -U /mnt >> /mnt/etc/fstab
+cp -R easyarch /mnt/easyarch
+chmod +x /mnt/easyarch/chroot.sh
+export username
+export booter
+export gpubrand
+export type
+export rootpw
+export password
+arch-chroot /mnt ./easyarch/chroot.sh
