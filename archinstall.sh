@@ -111,6 +111,7 @@ elif [ "$type" = "NVME" ]; then
     mkdir /mnt/boot
     mount /dev/$drive\p1 /mnt/boot
 fi
+reflector --verbose --country 'United States' -l 5 --sort rate --save /etc/pacman.d/mirrorlist
 if [ "$cpubrand" = "Intel" ]; then
     pacstrap -K /mnt base base-devel linux linux-firmware git curl intel-ucode nano bash-completion networkmanager linux-headers
 elif [ "$cpubrand" = "AMD" ]; then
