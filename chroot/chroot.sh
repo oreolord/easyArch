@@ -3,9 +3,11 @@
 install_desktop() {
     if [ "$1" = "kde" ]; then
         pacman -S --noconfirm plasma-meta firefox konsole sddm pipewire dolphin
+        systemctl enable sddm
     fi
     if [ "$1" = "gnome" ]; then
         pacman -S --noconfirm gnome nautilus firefox gnome-terminal gdm pipewire
+        systemctl enable gdm
     fi
 }
 
@@ -46,12 +48,12 @@ install_aur_helper() {
     if [ "$1" == "paru" ]; then
         git clone https://aur.archlinux.org/paru.git
         cd paru
-        makepkg -si
+        sudo -u $username makepkg -si
         cd
     elif [ "$1" == "yay" ]; then
         git clone https://aur.archlinux.org/yay.git
         cd yay
-        makepkg -si
+        sudo -u $username makepkg -si
         cd
     fi
 }
