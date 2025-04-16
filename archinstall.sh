@@ -9,7 +9,8 @@ do
     gpubrand=""
     cpubrand=""
     booter=""
-
+    desktop=""
+    
     if [[ "${drive:0:3}" == "nvm" ]]; then
         type="NVME"
     else
@@ -50,6 +51,23 @@ do
                 ;;
             "Systemd (faster)")
                 booter="Systemd"
+                break
+                ;;
+        esac
+    done
+    PS3="Pick a desktop: "
+    select optionc in "KDE" "GNOME" "Minimal"; do
+        case $optionc in
+            "KDE")
+                desktop="kde"
+                break
+                ;;
+            "GNOME")
+                desktop="gnome"
+                break
+                ;;
+            "Minimal")
+                desktop="minimal"
                 break
                 ;;
         esac
@@ -129,4 +147,5 @@ export type
 export rootpw
 export password
 export hostname
+export desktop
 arch-chroot /mnt ./easyarch/chroot.sh
