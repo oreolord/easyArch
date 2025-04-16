@@ -125,7 +125,7 @@ do
     echo "   GPU: $gpubrand      | Username: $username  "
     echo "   Boot: $booter    | Password: $password   "
     echo "   Drive: $drivetemp     | Rootpswd: $rootpw     "
-    echo "   Type: $type     | AUR: $aurhelper  "
+    echo "   AUR: $aurhelper     | Desktop: $desktop  "
     echo "Are these settings correct? y/n"
     read start
 done
@@ -162,8 +162,7 @@ mkswap $swappar
 mkfs.ext4 $rootpar
 swapon $swappar
 mount $rootpar /mnt
-mkdir /mnt/boot
-mount $bootpar /mnt/boot
+mount -m $bootpar /mnt/boot
 
 # Rate mirrors
 reflector --verbose --country 'United States' -l 5 --sort rate --save /etc/pacman.d/mirrorlist
@@ -173,7 +172,7 @@ install_linux $cpubrand
 genfstab -U /mnt >> /mnt/etc/fstab
 
 # Set up and start chroot script
-cp -R easyarch /mnt/easyarch
+cp -R easyarch/chroot /mnt/easyarch
 chmod +x /mnt/easyarch/chroot.sh
 
 # Export environment variables for chroot use
