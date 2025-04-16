@@ -47,11 +47,13 @@ install_drivers() {
 install_aur_helper() {
     if [ "$1" == "paru" ]; then
         git clone https://aur.archlinux.org/paru.git
+        chmod +x paru
         cd paru
         sudo -u $username makepkg -si
         cd
     elif [ "$1" == "yay" ]; then
         git clone https://aur.archlinux.org/yay.git
+        chmod +x paru
         cd yay
         sudo -u $username makepkg -si
         cd
