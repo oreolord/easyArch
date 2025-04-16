@@ -19,6 +19,7 @@ install_bootloader() {
         if [ "$2" == "NVIDIA" ]; then
             cp easyarch/grub /etc/default/grub
         fi
+
     fi
     if [ "$1" = "Systemd" ]; then
         bootctl install
@@ -47,15 +48,21 @@ install_drivers() {
 install_aur_helper() {
     if [ "$1" == "paru" ]; then
         git clone https://aur.archlinux.org/paru.git
-        chmod +x paru
+        chgrp $username /paru
+        chmod g+ws /paru
+        setfacl -m u::rwx,g::rwx /paru
+        setfacl -d --set u::rwx,g::rwx,o::- /paru
         cd paru
         sudo -u $username makepkg -si
         cd
     elif [ "$1" == "yay" ]; then
         git clone https://aur.archlinux.org/yay.git
-        chmod +x paru
+        chgrp $username /yay
+        chmod g+ws /yay
+        setfacl -m u::rwx,g::rwx /yay
+        setfacl -d --set u::rwx,g::rwx,o::- /yay
         cd yay
-        sudo -u $username makepkg -si
+        runuser -u $username makepkg -si
         cd
     fi
 }
