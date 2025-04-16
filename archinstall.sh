@@ -1,10 +1,35 @@
 #!/bin/bash
+
+set_drive_vars() {
+    if [ "$2" == "SATA" ]; then
+        bootpar="$1\1"
+        swappar="$1\2"
+        rootpar="$1\3"
+    else
+        bootpar="$1\p1"
+        swappar="$1\p2"
+        rootpar="$1\p3"
+    fi
+}
+
+install_linux() {
+    if [ "$1" = "Intel" ]; then
+        pacstrap -K /mnt base base-devel linux linux-firmware git curl intel-ucode nano bash-completion networkmanager linux-headers
+    elif [ "$1" = "AMD" ]; then
+        pacstrap -K /mnt base base-devel linux linux-firmware git curl amd-ucode nano bash-completion networkmanager linux-headers
+    else
+        pacstrap -K /mnt base base-devel linux linux-firmware git curl nano bash-completion networkmanager linux-headers
+    fi
+}
+
+# Ask system specs
 start="n"
 while [ "$start" != "y" ]
 do
     lsblk
     echo "Which drive would you like to install on?"
-    read drive
+    read drivetemp
+    drive="/dev/$drivetemp"
     type=""
     gpubrand=""
     cpubrand=""
@@ -56,8 +81,8 @@ do
         esac
     done
     PS3="Pick a desktop: "
-    select optionc in "KDE" "GNOME" "Minimal"; do
-        case $optionc in
+    select optiond in "KDE" "GNOME" "Minimal"; do
+        case $optiond in
             "KDE")
                 desktop="kde"
                 break
@@ -68,6 +93,19 @@ do
                 ;;
             "Minimal")
                 desktop="minimal"
+                break
+                ;;
+        esac
+    done
+    PS3="Pick an AUR helper: "
+    select optione in "paru" "yay"; do
+        case $optione in
+            "paru")
+                aurhelper="paru"
+                break
+                ;;
+            "yay")
+                aurhelper="yay"
                 break
                 ;;
         esac
@@ -83,20 +121,22 @@ do
     echo "Selected options:"
     echo "|       System       |        Users       |"
     echo "-------------------------------------------"
-    echo "|   CPU: $cpubrand      | Hostname: $hostname   |"
-    echo "|   GPU: $gpubrand      | Username: $username  |"
-    echo "|   Boot: $booter    | Password: $password   |"
-    echo "|   Drive: $drive     | Rootpswd: $rootpw     |"
-    echo "|   Type: $type     |                      |"
+    echo "   CPU: $cpubrand      | Hostname: $hostname   "
+    echo "   GPU: $gpubrand      | Username: $username  "
+    echo "   Boot: $booter    | Password: $password   "
+    echo "   Drive: $drivetemp     | Rootpswd: $rootpw     "
+    echo "   Type: $type     | AUR: $aurhelper  "
     echo "Are these settings correct? y/n"
     read start
 done
-parted /dev/$drive mklabel gpt
+
+# Wipe and partition drive
+parted $drive mklabel gpt
 (
 echo n # Add a new partition
 echo   # Partition number
-echo   # First sector (Accept default: 1)
-echo +512M # Last sector (Accept default: varies)
+echo   # First sector
+echo +512M # Size
 echo t # Change type
 echo 1 # Efi system
 echo n
@@ -111,35 +151,32 @@ echo
 echo
 echo
 echo w
-) | fdisk /dev/$drive
-if [ "$type" = "SATA" ]; then
-    mkfs.fat -F32 /dev/$drive\1
-    mkswap /dev/$drive\2
-    mkfs.ext4 /dev/$drive\3
-    swapon /dev/$drive\2
-    mount /dev/$drive\3 /mnt
-    mkdir /mnt/boot
-    mount /dev/$drive\1 /mnt/boot
-elif [ "$type" = "NVME" ]; then
-    mkfs.fat -F32 /dev/$drive\p1
-    mkswap /dev/$drive\p2
-    mkfs.ext4 /dev/$drive\p3
-    swapon /dev/$drive\p2
-    mount /dev/$drive\p3 /mnt
-    mkdir /mnt/boot
-    mount /dev/$drive\p1 /mnt/boot
-fi
+) | fdisk $drive
+
+# Set drive variables for easy formatting
+set_drive_vars $drive $type
+
+# Format and mount partitions
+mkfs.fat -F32 $bootpar
+mkswap $swappar
+mkfs.ext4 $rootpar
+swapon $swappar
+mount $rootpar /mnt
+mkdir /mnt/boot
+mount $bootpar /mnt/boot
+
+# Rate mirrors
 reflector --verbose --country 'United States' -l 5 --sort rate --save /etc/pacman.d/mirrorlist
-if [ "$cpubrand" = "Intel" ]; then
-    pacstrap -K /mnt base base-devel linux linux-firmware git curl intel-ucode nano bash-completion networkmanager linux-headers
-elif [ "$cpubrand" = "AMD" ]; then
-    pacstrap -K /mnt base base-devel linux linux-firmware git curl amd-ucode nano bash-completion networkmanager linux-headers
-else
-    pacstrap -K /mnt base base-devel linux linux-firmware git curl nano bash-completion networkmanager linux-headers
-fi
+
+# Install linux
+install_linux $cpubrand
 genfstab -U /mnt >> /mnt/etc/fstab
+
+# Set up and start chroot script
 cp -R easyarch /mnt/easyarch
 chmod +x /mnt/easyarch/chroot.sh
+
+# Export environment variables for chroot use
 export username
 export booter
 export gpubrand
@@ -148,4 +185,6 @@ export rootpw
 export password
 export hostname
 export desktop
+export rootpar
+export aurhelper
 arch-chroot /mnt ./easyarch/chroot.sh
