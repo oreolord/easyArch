@@ -12,8 +12,8 @@ install_desktop() {
 }
 
 install_grub_theme() {
-    git clone https://downgit.github.io/\#/home?url=https://github.com/vinceliuice/Graphite-gtk-theme/tree/main/other/grub2
-    cd /grub2
+    git clone https://downgit.github.io/#/home?url=https://github.com/vinceliuice/Graphite-gtk-theme/tree/main/other/grub2
+    cd grub2
     ./install.sh -b -t window
     cd
     rm -rf grub2
@@ -57,24 +57,24 @@ install_drivers() {
 install_aur_helper() {
     if [ "$1" == "paru" ]; then
         git clone https://aur.archlinux.org/paru.git
-        chgrp $username /paru
-        chmod g+ws /paru
-        setfacl -m u::rwx,g::rwx /paru
-        setfacl -d --set u::rwx,g::rwx,o::- /paru
+        chgrp nobody paru
+        chmod g+ws paru
+        setfacl -m u::rwx,g::rwx paru
+        setfacl -d --set u::rwx,g::rwx,o::- paru
         cd paru
-        runuser -u $username makepkg -si
+        runuser -u nobody makepkg -si
         cd
         rm -rf paru
     elif [ "$1" == "yay" ]; then
         git clone https://aur.archlinux.org/yay.git
-        chgrp $username /yay
-        chmod g+ws /yay
-        setfacl -m u::rwx,g::rwx /yay
-        setfacl -d --set u::rwx,g::rwx,o::- /yay
+        chgrp nobody yay
+        chmod g+ws yay
+        setfacl -m u::rwx,g::rwx yay
+        setfacl -d --set u::rwx,g::rwx,o::- yay
         cd yay
-        runuser -u $username makepkg -si
+        runuser -u nobody makepkg -si
         cd
-        rm -rf paru
+        rm -rf yay
     fi
 }
 
