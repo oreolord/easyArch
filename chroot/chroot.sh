@@ -53,7 +53,7 @@ install_aur_helper() {
         setfacl -m u::rwx,g::rwx /paru
         setfacl -d --set u::rwx,g::rwx,o::- /paru
         cd paru
-        sudo -u $username makepkg -si
+        runuser -u $username makepkg -si
         cd
     elif [ "$1" == "yay" ]; then
         git clone https://aur.archlinux.org/yay.git
