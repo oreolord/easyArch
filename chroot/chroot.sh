@@ -22,9 +22,9 @@ install_bootloader() {
         bootctl install
         cp easyarch/arch.conf /boot/loader/entries/arch.conf
         if [ "$2" == "NVIDIA" ]; then
-            echo "options root=PARTUUID=$(blkid -s PARTUUID -o value $rootpar)) rw nvidia_drm.modeset=1 quiet" >> /boot/loader/entries/arch.conf
+            echo "options root=PARTUUID=$(blkid -s PARTUUID -o value $rootpar)) rw nvidia_drm.modeset=1 quiet splash loglevel=3" >> /boot/loader/entries/arch.conf
         else
-            echo "options root=PARTUUID=$(blkid -s PARTUUID -o value $rootpar) rw quiet" >> /boot/loader/entries/arch.conf
+            echo "options root=PARTUUID=$(blkid -s PARTUUID -o value $rootpar) rw quiet splash loglevel=3" >> /boot/loader/entries/arch.conf
         fi
     fi
 }
