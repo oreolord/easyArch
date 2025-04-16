@@ -14,8 +14,8 @@ Boots with either GRUB or systemd boot
 2. Put in these commands one by one:
 ```
 pacman -Sy git
-git clone https://github.com/oreolord/easyArch.git
-chmod +x easyarch/archinstall.sh
-./easyarch/archinstall.sh
+git clone https://github.com/oreolord/easyarch.git
+chmod +x easyarch/install.sh
+./easyarch/install.sh
 ```
 4. Fill out the options.
