@@ -2,13 +2,13 @@
 
 set_drive_vars() {
     if [ "$2" == "SATA" ]; then
-        bootpar="$1\1"
-        swappar="$1\2"
-        rootpar="$1\3"
+        bootpar="$1""1"
+        swappar="$1""2"
+        rootpar="$1""3"
     else
-        bootpar="$1\p1"
-        swappar="$1\p2"
-        rootpar="$1\p3"
+        bootpar="$1""p1"
+        swappar="$1""p2"
+        rootpar="$1""p3"
     fi
 }
 
