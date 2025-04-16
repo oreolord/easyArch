@@ -11,6 +11,15 @@ install_desktop() {
     fi
 }
 
+install_grub_theme() {
+    git clone https://downgit.github.io/\#/home?url=https://github.com/vinceliuice/Graphite-gtk-theme/tree/main/other/grub2
+    cd /grub2
+    ./install.sh -b -t window
+    cd
+    rm -rf grub2
+}
+
+
 install_bootloader() {
     if [ "$1" = "Grub" ]; then
         pacman -S --noconfirm grub efibootmgr dosfstools mtools
@@ -19,7 +28,7 @@ install_bootloader() {
         if [ "$2" == "NVIDIA" ]; then
             cp easyarch/grub /etc/default/grub
         fi
-
+        install_grub_theme
     fi
     if [ "$1" = "Systemd" ]; then
         bootctl install
@@ -55,6 +64,7 @@ install_aur_helper() {
         cd paru
         runuser -u $username makepkg -si
         cd
+        rm -rf paru
     elif [ "$1" == "yay" ]; then
         git clone https://aur.archlinux.org/yay.git
         chgrp $username /yay
@@ -64,6 +74,7 @@ install_aur_helper() {
         cd yay
         runuser -u $username makepkg -si
         cd
+        rm -rf paru
     fi
 }
 
