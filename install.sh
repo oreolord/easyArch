@@ -14,11 +14,11 @@ set_drive_vars() {
 
 install_linux() {
     if [ "$1" = "Intel" ]; then
-        pacstrap -K /mnt base base-devel linux linux-firmware git curl intel-ucode nano bash-completion networkmanager linux-headers
+        pacstrap -K /mnt base base-devel linux linux-firmware git curl intel-ucode nano bash-completion networkmanager linux-headers os-prober
     elif [ "$1" = "AMD" ]; then
-        pacstrap -K /mnt base base-devel linux linux-firmware git curl amd-ucode nano bash-completion networkmanager linux-headers
+        pacstrap -K /mnt base base-devel linux linux-firmware git curl amd-ucode nano bash-completion networkmanager linux-headers os-prober
     else
-        pacstrap -K /mnt base base-devel linux linux-firmware git curl nano bash-completion networkmanager linux-headers
+        pacstrap -K /mnt base base-devel linux linux-firmware git curl nano bash-completion networkmanager linux-headers os-prober
     fi
 }
 
