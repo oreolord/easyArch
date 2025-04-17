@@ -32,6 +32,7 @@ def clear():
 def setup():
     confirm = False
     while confirm == False:
+        clear()
         print("Select a drive.")
         drive = subprocess.run(generate_list(search_disks()), stdout=subprocess.PIPE, text=True).stdout.rstrip()
         clear()
