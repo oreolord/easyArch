@@ -18,4 +18,5 @@ os.system("reflector --verbose --country 'United States' -l 5 --sort rate --save
 install_linux(cpu)
 os.system("genfstab -U /mnt >> /mnt/etc/fstab")
 os.system("cp -R easyarch /mnt/easyarch")
+os.system("chmod +x /mnt/easyarch/chroot.sh")
 os.system(f"arch-chroot /mnt ./easyarch/chroot.sh {bootloader} {desktop} {hostname} {username} {password} {rootpswd} {gpu} {rootpar}")
