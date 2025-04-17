@@ -1,6 +1,20 @@
 import subprocess
 import os
 
+def get_gpu():
+    data = subprocess.run(['bash', '-c', 'lspci | grep -i "VGA" | awk -F ": " \'{print $2}\' | awk \'{print $1}\''], capture_output=True, text=True).stdout.rstrip()
+    for line in data.splitlines():
+        if line == "NVIDIA":
+            return "NVIDIA"
+    return "AMD"
+
+def get_cpu():
+    data = subprocess.run(['bash', '-c', 'lscpu | grep \"Vendor ID\" | awk -F\":\" \'{print $2}\' | sed \'s/ //g\''], capture_output=True, text=True).stdout.rstrip()
+    for line in data.splitlines():
+        if line == "GenuineIntel":
+            return "Intel"
+    return "AMD"
+
 def find_partitions(drive):
     if drive[5:8] == "nvm":
         return drive + "p1", drive + "p2", drive + "p3"
@@ -37,14 +51,6 @@ def setup():
         drive = subprocess.run(generate_list(search_disks()), stdout=subprocess.PIPE, text=True).stdout.rstrip()
         clear()
 
-        print("Select your CPU's brand.")
-        cpu = subprocess.run(generate_list(["Intel", "AMD"]), stdout=subprocess.PIPE, text=True).stdout.rstrip()
-        clear()
-
-        print("Select your GPU's brand.")
-        gpu = subprocess.run(generate_list(["NVIDIA", "AMD"]), stdout=subprocess.PIPE, text=True).stdout.rstrip()
-        clear()
-
         print("Select a bootloader.")
         bootloader = subprocess.run(generate_list(["Grub", "Systemd"]), stdout=subprocess.PIPE, text=True).stdout.rstrip()
         clear()
@@ -76,4 +82,4 @@ def setup():
             confirm = False
         print(confirm)
         clear()
-    return [drive, cpu, gpu, bootloader, desktop, hostname, username, password, rootpswd]
+    return [drive, get_cpu(), get_gpu(), bootloader, desktop, hostname, username, password, rootpswd]
