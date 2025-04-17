@@ -4,7 +4,7 @@ import os
 
 drive, cpu, gpu, bootloader, desktop, hostname, username, password, rootpswd = setup()
 drive = f"/dev/{drive}"
-os.system(f"parted {drive} mklabel gpt")
+os.system(f"parted -s {drive} mklabel gpt")
 echo_sequence = "echo n\necho  \necho  \necho +512M\necho t\necho 1\necho  n\necho  \necho  \necho +8G\necho t\necho 2\necho 19\necho n\necho  \necho  \necho  \necho w"
 os.system(f"({echo_sequence}) | fdisk {drive}")
 bootpar, swappar, rootpar = find_partitions(drive)
