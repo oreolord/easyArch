@@ -3,7 +3,7 @@ import os
 from sys import argv
 from functions import install_bootloader, install_desktop, install_drivers
 
-bootloader, desktop, hostname, username, password, rootpswd, gpu, rootpar = argv
+script, bootloader, desktop, hostname, username, password, rootpswd, gpu, rootpar = argv
 
 os.system(f"( echo {rootpswd}; echo {rootpswd} ) | passwd")
 os.system(f"useradd -m -g users -G wheel,power,storage,video,audio -s /bin/bash {username}")
@@ -16,7 +16,7 @@ os.system("ln -sf /usr/share/zoneinfo/US/Eastern /etc/localtime")
 os.system("hwclock --systohc")
 
 localegen = "en_US.UTF-8 UTF-8"
-os.system(f"echo '{localegen}' > /etc/locale.gen'")
+os.system(f"echo '{localegen}' > /etc/locale.gen")
 os.system("locale-gen")
 
 os.system("echo LANG=en_US.UTF-8 > /etc/locale.conf")
